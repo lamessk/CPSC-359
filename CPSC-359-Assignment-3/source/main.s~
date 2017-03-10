@@ -1,0 +1,55 @@
+.section    .init
+.globl     _start
+
+_start:
+    b       main
+    
+.section .text
+
+main:
+	mov     	sp, #0x8000 	// Initializing the stack pointer
+	bl		EnableJTAG 	// Enable JTAG
+	bl		InitUART   	// Initialize the UART
+
+getAddress:
+	ldr		r0, =0x20200004	//r0 = BASE address
+	ldr		r1, [r0]	//r1 = base address
+
+	mov		r2, #0b111	//r2 = clear mask
+	
+	bic		r1, r2, lsl #18 //r2 = left shift by 18
+					//r1 = bitcleared
+
+	mov		r2, #0b001	//r2 = output
+	
+	orr		r1, r2, lsl #18 //r2 = left shift by 18
+					//r1 = gpio address, output written
+
+	str		r1, [r0] 	//store register to memory
+
+on:
+	ldr		r0, =0x2020001C	//set register 0 = 2020001c (bits 0-31)
+	mov		r1, #0x00010000
+	str		r1, [r0]	//write to set register
+	
+	mov		r5, #0
+	
+wait:
+	cmp		r5, #0xff0000
+	beq		off
+	add		r5, r5, #1
+	b		wait
+
+off:
+	ldr		r0, =0x20200028	//clear register 0 = 20200028 (bits 0=31)
+	mov		r1, #0x00010000
+	str		r1, [r0]	//write to set register
+	
+	mov		r5, #0
+
+wait2:
+	cmp		r5, #0xff0000
+	beq		on
+	add		r5, r5, #1
+	b		wait2
+

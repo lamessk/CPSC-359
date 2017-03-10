@@ -1,0 +1,409 @@
+//AUTHORS: LAMESS KHARFAN AND SHANNON TUCKER-JONES
+//SOURCES USED: MICROARCHITECTURE LECTURE SLIDES (JALAL KAWASH)
+
+.constant
+OBJREF 0x40			
+.end-constant
+
+//MAIN: Start of program, stores division and multiplication results, 
+//loads these results to the top of the stack (TOS = divresult, Next to top = mulresult)
+
+//Local variables (int1, int2, return_type, mulresult, divresult)
+.main				
+
+.var				
+int1
+int2
+return_type
+mulresult
+divresult
+.end-var
+
+start:	
+	//Enter a value for INT1:
+	BIPUSH 0x8
+	ISTORE int1
+
+	//Uncomment this code to negate INT1:
+	
+	BIPUSH 0x1
+	ILOAD int1
+	INEG
+	ISTORE int1
+	
+
+	//Enter a value for INT2:
+	BIPUSH 0x4
+	ISTORE int2
+
+	//Uncomment this code to negate INT2:
+	
+	BIPUSH 0x1
+	ILOAD int2
+	INEG
+	ISTORE int2
+	
+
+	//Enter a value for RETURN_TYPE:
+	BIPUSH 0x0
+	ISTORE return_type
+
+
+	//INVOKE DIVISION METHOD
+	//Division parameters (int1, int2, return_type)
+	//Store result in local variable
+	LDC_W	OBJREF
+	ILOAD int1
+	ILOAD int2
+	ILOAD return_type
+	INVOKEVIRTUAL div
+	ISTORE divresult
+
+
+	//INVOKE MULTIPLICATION METHOD
+	//Multiplication parameters (int1, int2)
+	//Store result in local variable
+	LDC_W	OBJREF
+	ILOAD int1
+	ILOAD int2
+	INVOKEVIRTUAL mul
+	ISTORE mulresult
+
+	//Load results to the stack (division result on top)
+	ILOAD mulresult
+	ILOAD divresult
+
+	//Stop program
+	HALT
+
+.end-main
+
+
+//MULTIPLICATION: Multiplies int1 * int2, returns the result on the top of the stack
+//Parameters (int1, int2)
+//Local variables (abs1, abs2, m, c, o, i)
+
+.method mul(int1, int2)
+
+.var
+abs1
+abs2
+m
+c
+o
+i
+.end-var
+
+//Initialize m, c, o, i
+mul:
+	BIPUSH 0x0			//initializes m, m = 0
+	ISTORE m
+
+	BIPUSH 0x0			//initializes c, c = 0
+	ISTORE c
+
+	BIPUSH 0x0			//initializes o, o = 0
+	ISTORE o
+
+	BIPUSH 0x0			//initializes i, i = 0
+	ISTORE i
+	
+//Check if INT1 is negative
+//If so, get its absolute value
+//Store INT1 in ABS1
+check1:	
+	ILOAD int1
+	IFLT neg1
+
+	ILOAD int1
+	ISTORE abs1
+	GOTO check2
+
+//Get absolute value of INT1
+//Store -INT1 in ABS1
+neg1:
+	BIPUSH 0x1
+	ILOAD int1
+	INEG
+	ISTORE abs1
+
+//Check if INT2 is negative
+//If so, get its absolute value
+//Store INT2 in ABS2
+check2:
+	ILOAD int2
+	IFLT neg2
+
+	ILOAD int2
+	ISTORE abs2
+	GOTO getmaxmin
+
+//Get absolute value of INT2
+//Store -INT2 in ABS2
+neg2:
+	BIPUSH 0x1
+	ILOAD int2
+	INEG
+	ISTORE abs2
+
+//Compare ABS1 and ABS2, get the Max and Min
+//Check if ABS2 < ABS1 (INT2 - INT1 = negative)
+//If so, ABS2 is the Min
+//If not, ABS1 is the Min
+getmaxmin:
+	ILOAD abs2
+	ILOAD abs1
+	ISUB
+	IFLT maxmin2
+
+//ABS1 is MIN, ABS2 is MAX
+//Initialize c, o values
+//C = MIN
+//O = MAX
+maxmin1:
+	ILOAD abs1		//initializes c, c = int1
+	ISTORE c
+
+	ILOAD abs2		//initializes o, o = int2
+	ISTORE o
+	GOTO formul
+
+//ABS2 is MIN, ABS1 is MAX
+//Initialize c, o values
+//C = MIN
+//O = MAX
+maxmin2:
+	ILOAD abs2		//initializes c, c = int2
+	ISTORE c
+
+	ILOAD abs1 		//initializes o, o = int1
+	ISTORE o
+
+//FORMUL: for (i = 0; i < c; i++)
+//Loop that adds O (MAX) to itself C (MIN) times (= MAX * MIN)
+formul:
+
+	//Check if I < C 
+	//If not (I = C), break out of loop
+	ILOAD i
+	ILOAD c
+	IF_ICMPEQ ifmul
+
+	//M will contain the multiplication result
+	//M = M + O
+	ILOAD m			
+	ILOAD o
+	IADD
+	ISTORE m
+
+	//Increment I on every loop iteration
+	//I++
+	ILOAD i			
+	BIPUSH 0x1
+	IADD
+	ISTORE i
+
+	//Restart another loop iteration
+	GOTO formul 		
+
+
+//Check if INT1 is negative
+//Branch accordingly
+ifmul:
+	ILOAD	int1
+	IFLT negmul		
+				
+
+//INT1 is positive
+//Now check if INT2 is negative
+//If so, the multiplication result is negative
+//Else, the multiplication result is positive
+//Branch accordingly
+posmul:
+	ILOAD int2
+	IFLT negmulm		//int1 pos, int2 neg
+	GOTO returnm 		//int1 pos, int2 pos
+
+
+//INT1 is negative
+//Now check if INT2 is negative
+//If so, the multiplication result is positive
+//Else, the multiplication result is negative
+//Branch accordingly
+negmul:
+	ILOAD 	int2
+	IFLT returnm		//int1 neg, int2 neg
+				
+
+//The multiplication result is negative
+//Therefore, negate M
+//M = -M
+negmulm:
+	BIPUSH 0x0		
+	ILOAD m
+	ISUB
+	ISTORE m
+
+//Return M to MAIN
+returnm:
+	ILOAD m			
+	IRETURN
+
+.end-method
+
+
+
+//DIVISION: Divides int1 / int2, returns the result on the top of the stack 
+//This result can be the quotient or the remainder, depending on the value of return_type
+//Parameters (int1, int2, return_type)
+//Local variables (abs1_int, abs_int2, q, r)
+
+.method div(int1, int2, return_type)
+
+.var
+abs_int1
+abs_int2
+q
+r
+.end-var
+
+div:
+
+//Check if INT1 is negative
+//If so, get its absolute value
+//Store INT1 into ABS_INT1
+checkdiv1:	
+	ILOAD int1
+	IFLT negdiv1
+
+	ILOAD int1
+	ISTORE abs_int1
+	GOTO checkdiv2
+
+//Store -INT1 into ABS_INT1
+negdiv1:
+	BIPUSH 0x1
+	ILOAD int1
+	INEG
+	ISTORE abs_int1
+
+//Check if INT2 is negative
+//If so, get its absolute value
+//Store INT2 into ABS_INT2
+checkdiv2:
+	ILOAD int2
+	IFLT negdiv2
+
+	ILOAD int2
+	ISTORE abs_int2
+	GOTO nextdiv
+
+//Store -INT2 into ABS_INT2
+negdiv2:
+	BIPUSH 0x1
+	ILOAD int2
+	INEG
+	ISTORE abs_int2
+
+//Initialize Q (quotient) and R (remainder) values
+//Q = 0
+//R = ABS_INT1
+nextdiv:
+	BIPUSH 0x0		//initializes q, q = 0
+	ISTORE q
+
+	ILOAD abs_int1		//r = abs_int1 
+	ISTORE r
+
+//WHILEDIV: while (R >= ABS_INT2)
+//Loop that increments Q and subtracts ABS_INT2 from R
+//Number of loop iterations = quotient of ABS_INT1 / ABS_INT2
+whilediv:
+
+	//Check if R < ABS_INT2 (R >= ABS_INT2)
+	//If so, break out of while loop
+	ILOAD r
+	ILOAD abs_int2
+	ISUB
+	IFLT ifdiv
+
+	//Subtract ABS_INT2 from R
+	//R will contain the remainder result
+	//R = R - ABS_INT2
+	ILOAD r			
+	ILOAD abs_int2
+	ISUB
+	ISTORE r
+
+	//Increments Q on every loop iteration
+	//Q will contain the quotient result
+	//Q++
+	ILOAD q			
+	BIPUSH 0x1
+	IADD
+	ISTORE q
+
+	//Restart another loop iteration
+	GOTO whilediv	
+
+//Check if INT1 is negative
+//Branch accordingly
+ifdiv:
+	ILOAD	int1
+	IFLT negdiv	//int1 = neg
+			
+
+//INT1 is positive
+//Now check if INT2 is negative
+//If so, the division result is negative
+//Else, the division result is positive
+//Branch accordingly
+posdiv:
+	ILOAD int2
+	IFLT negdivq	//int1 pos, int2 neg
+	GOTO ifdiv2 	//int1 pos, int2 pos
+
+
+//INT1 is negative
+//Now check if INT2 is negative
+//If so, the division result is positive
+//Else, the division result is negative
+//Branch accordingly
+negdiv:
+	ILOAD 	int2
+	IFLT ifdiv2	//int1 neg, int2 neg
+			
+
+//The division result is negative
+//Therefore, negate Q
+//Q = -Q
+negdivq:
+	BIPUSH 0x1		
+	ILOAD q
+	INEG 
+	ISTORE q
+
+	//BIPUSH 0x1		
+	//ILOAD r
+	//INEG 
+	//ISTORE r
+
+//Check the value of the return type
+//If 0, return Q
+//Else, return R
+ifdiv2:
+	ILOAD return_type	
+	BIPUSH 0x0
+	IF_ICMPEQ returnq
+
+//Return R to MAIN
+	ILOAD r			
+	IRETURN
+
+//Return Q to MAIN
+returnq:
+	ILOAD q
+	IRETURN
+	
+
+.end-method

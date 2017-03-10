@@ -1,0 +1,49 @@
+//AUTHORS: LAMESS KHARFAN AND SHANNON TUCKER-JONES
+//SOURCES USED: MICROARCHITECTURE LECTURE SLIDES (JALAL KAWASH)
+
+.constant
+OBJREF 0x40			
+.end-constant
+
+//MAIN: Start of program, stores division and multiplication results, 
+//loads these results to the top of the stack (TOS = div, Next to top = mul)
+
+//Local variables (i1, i2, mul, div)
+.main
+.var
+i1
+i2				
+mul
+div
+.end-var
+
+//ENTER A VALUE FOR I1:
+BIPUSH 0x4
+ISTORE i1
+
+//ENTER A VALUE FOR I2:
+BIPUSH 0x2
+ISTORE i2
+
+//MULTIPLY I1 * I2
+//STORE RESULT IN MUL
+ILOAD i1
+ILOAD i2
+IMUL
+ISTORE mul
+
+//DIVIDE I1 / I2
+//STORE RESULT IN DIV
+ILOAD i1
+ILOAD i2
+IDIV
+ISTORE div
+
+//LOAD MUL AND DIV
+//TOS = div, Next to top = mul
+ILOAD mul
+ILOAD div
+
+//STOP PROGRAM
+HALT
+.end-main

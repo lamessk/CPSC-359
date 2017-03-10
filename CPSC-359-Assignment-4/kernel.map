@@ -1,0 +1,183 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD build/jtag.o
+LOAD build/FrameBufferPixel.o
+LOAD build/main.o
+LOAD build/printMessage.o
+LOAD build/SNESDriver.o
+LOAD build/pictures.o
+LOAD build/drawings.o
+
+.init           0x00008000        0x4
+ *(.init)
+ .init          0x00008000        0x4 build/main.o
+                0x00008000                _start
+
+.data           0x00009080   0x331f14
+ *(.data)
+ .data          0x00009080        0x0 build/jtag.o
+ .data          0x00009080       0x30 build/FrameBufferPixel.o
+                0x00009080                FrameBufferInfo
+                0x000090a8                FrameBufferPointer
+ .data          0x000090b0      0x140 build/main.o
+ .data          0x000091f0      0x890 build/printMessage.o
+                0x00009a30                scoreNum
+                0x00009a34                liveNum
+ .data          0x00009a80       0x10 build/SNESDriver.o
+                0x00009a80                buttonPress
+ .data          0x00009a90   0x331504 build/pictures.o
+                0x00009a90                arrow
+                0x0000a1d4                gameOverImage
+                0x000b0254                loseImage
+                0x001834b4                winImage
+                0x00256714                mainImage
+ .data          0x0033af94        0x0 build/drawings.o
+ *.c.o(*)
+
+.igot.plt       0x0033af94        0x0
+ .igot.plt      0x00000000        0x0 build/jtag.o
+
+.text           0x0033af94     0x1cd4
+ *.c.o(.text)
+ *(.text)
+ .text          0x0033af94       0x8c build/jtag.o
+                0x0033af94                EnableJTAG
+ .text          0x0033b020       0xb8 build/FrameBufferPixel.o
+                0x0033b020                InitFrameBuffer
+                0x0033b068                MailboxWrite
+                0x0033b098                MailboxRead
+ .text          0x0033b0d8      0xf10 build/main.o
+                0x0033bf5c                DrawPixel
+ .text          0x0033bfe8      0x36c build/printMessage.o
+                0x0033bfe8                startLives
+                0x0033c018                startScore
+                0x0033c048                printLiveNum
+                0x0033c078                printScoreNum
+                0x0033c0a8                printReady
+                0x0033c0d8                printLose
+                0x0033c108                printWin
+                0x0033c138                printOver
+                0x0033c168                namesLabel
+                0x0033c198                startSG
+                0x0033c1c8                startQG
+                0x0033c1f8                printCont
+                0x0033c228                printQuit
+                0x0033c258                printPause
+                0x0033c288                DrawChar
+ .text          0x0033c354      0x31c build/SNESDriver.o
+                0x0033c354                getInput
+                0x0033c404                initGPIO
+                0x0033c488                writeLatch
+                0x0033c4b0                writeClock
+                0x0033c4d8                readData
+                0x0033c508                wait
+                0x0033c528                readSNES
+                0x0033c54c                updateButtonPress
+ .text          0x0033c670        0x0 build/pictures.o
+ .text          0x0033c670      0x5f8 build/drawings.o
+                0x0033c670                startImage
+                0x0033c6d4                drawLoseImage
+                0x0033c738                drawWinImage
+                0x0033c79c                drawGameOver
+                0x0033c800                drawArrow
+                0x0033c860                drawOver
+                0x0033c8bc                clearScreen
+                0x0033c910                drawBorder
+                0x0033c9d0                drawBoxes
+                0x0033caf8                drawCell
+                0x0033cb38                drawBorderPause
+                0x0033cb78                drawBorderTopBottomPause
+                0x0033cbb8                drawBorderLeftRightPause
+                0x0033cbf8                clearScreenP
+OUTPUT(build/output.elf elf32-littlearm)
+
+.glue_7         0x0033cc68        0x0
+ .glue_7        0x00000000        0x0 linker stubs
+
+.glue_7t        0x0033cc68        0x0
+ .glue_7t       0x00000000        0x0 linker stubs
+
+.vfp11_veneer   0x0033cc68        0x0
+ .vfp11_veneer  0x00000000        0x0 linker stubs
+
+.v4_bx          0x0033cc68        0x0
+ .v4_bx         0x00000000        0x0 linker stubs
+
+.iplt           0x0033cc68        0x0
+ .iplt          0x00000000        0x0 build/jtag.o
+
+.rel.dyn        0x0033cc68        0x0
+ .rel.iplt      0x00000000        0x0 build/jtag.o
+
+.bss            0x0033cc68        0x0
+ .bss           0x0033cc68        0x0 build/jtag.o
+ .bss           0x0033cc68        0x0 build/FrameBufferPixel.o
+ .bss           0x0033cc68        0x0 build/main.o
+ .bss           0x0033cc68        0x0 build/printMessage.o
+ .bss           0x0033cc68        0x0 build/SNESDriver.o
+ .bss           0x0033cc68        0x0 build/pictures.o
+ .bss           0x0033cc68        0x0 build/drawings.o
+
+.ARM.attributes
+                0x00000000       0x26
+ .ARM.attributes
+                0x00000000       0x26 build/jtag.o
+ .ARM.attributes
+                0x00000026       0x26 build/FrameBufferPixel.o
+ .ARM.attributes
+                0x0000004c       0x26 build/main.o
+ .ARM.attributes
+                0x00000072       0x26 build/printMessage.o
+ .ARM.attributes
+                0x00000098       0x26 build/SNESDriver.o
+ .ARM.attributes
+                0x000000be       0x26 build/pictures.o
+ .ARM.attributes
+                0x000000e4       0x26 build/drawings.o
+
+.debug_line     0x00000000      0x971
+ .debug_line    0x00000000       0x61 build/jtag.o
+ .debug_line    0x00000061       0x81 build/FrameBufferPixel.o
+ .debug_line    0x000000e2      0x465 build/main.o
+ .debug_line    0x00000547      0x13c build/printMessage.o
+ .debug_line    0x00000683      0x117 build/SNESDriver.o
+ .debug_line    0x0000079a      0x1d7 build/drawings.o
+
+.debug_info     0x00000000      0x22a
+ .debug_info    0x00000000       0x56 build/jtag.o
+ .debug_info    0x00000056       0x62 build/FrameBufferPixel.o
+ .debug_info    0x000000b8       0x56 build/main.o
+ .debug_info    0x0000010e       0x62 build/printMessage.o
+ .debug_info    0x00000170       0x5c build/SNESDriver.o
+ .debug_info    0x000001cc       0x5e build/drawings.o
+
+.debug_abbrev   0x00000000       0x76
+ .debug_abbrev  0x00000000       0x14 build/jtag.o
+ .debug_abbrev  0x00000014       0x14 build/FrameBufferPixel.o
+ .debug_abbrev  0x00000028       0x12 build/main.o
+ .debug_abbrev  0x0000003a       0x14 build/printMessage.o
+ .debug_abbrev  0x0000004e       0x14 build/SNESDriver.o
+ .debug_abbrev  0x00000062       0x14 build/drawings.o
+
+.debug_aranges  0x00000000       0xd0
+ .debug_aranges
+                0x00000000       0x20 build/jtag.o
+ .debug_aranges
+                0x00000020       0x20 build/FrameBufferPixel.o
+ .debug_aranges
+                0x00000040       0x30 build/main.o
+ .debug_aranges
+                0x00000070       0x20 build/printMessage.o
+ .debug_aranges
+                0x00000090       0x20 build/SNESDriver.o
+ .debug_aranges
+                0x000000b0       0x20 build/drawings.o
+
+.debug_ranges   0x00000000       0x28
+ .debug_ranges  0x00000000       0x28 build/main.o
