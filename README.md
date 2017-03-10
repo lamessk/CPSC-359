@@ -1,5 +1,5 @@
 # CPSC-359
-Assignments written in ARM assembly in CPSC 359-Computing Machinery II during Winter 2016 semster. 
+Assignments written in ARM assembly in CPSC 359-Computing Machinery II during Winter 2016 semester. 
 
 Code was run on a Raspberry Pi.
 
