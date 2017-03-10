@@ -1,5 +1,7 @@
-# ARM-Assignments
-A selection of assignments written in ARM assembly, Winter 2016. Code was run on a Raspberry Pi.
+# CPSC-359
+Assignments written in ARM assembly in CPSC 359-Computing Machinery II during Winter 2016 semster. 
+
+Code was run on a Raspberry Pi.
 
 A2 receives user input (as integer values) and performs error checking on these values. Gets the sum and average, and prints messages to the terminal.
 
